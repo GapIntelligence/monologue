@@ -1,9 +1,10 @@
 class Monologue::AuthorPostsController < Monologue::ApplicationController
-  before_filter :set_page, only: :index
+  before_filter :set_page, only: [:index, :search]
+  before_filter :set_user, only: [:index, :search]
+  before_filter :set_posts, only: [:index, :search]
 
-  def index
-    @user = Monologue::User.find(params[:user_id])
-    @posts = @user.posts.page(@page).includes(:user).published
+  def search
+    @posts = @posts.search(params[:text], @page)
   end
 
   def show
@@ -26,4 +27,11 @@ class Monologue::AuthorPostsController < Monologue::ApplicationController
     @page = params[:page].nil? ? 1 : params[:page]
   end
 
+  def set_user
+    @user = Monologue::User.find(params[:user_id])
+  end
+
+  def set_posts
+    @posts = @user.posts.page(@page).published
+  end
 end
